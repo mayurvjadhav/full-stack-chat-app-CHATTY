@@ -43,9 +43,9 @@ export const SignUpPage = () => {
   };
 
   return (
-    <div className="m-30">
-      <div className="flex flex-col justify-center items-center p-6 sm:p-12">
-        <div className="w-full max-w-md space-y-8">
+    <div className="h-screen">
+      <div className="flex flex-col justify-center items-center p-6 sm:p-12 ">
+        <div className="w-full max-w-md space-y-8 m-30">
           {/*logo*/}
           <div className="text-center mb-8">
             <div className="flex flex-col items-center gap-2 group">

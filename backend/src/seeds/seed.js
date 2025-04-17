@@ -35,12 +35,6 @@ const seedUsers = [
     password: 123456,
     profilePic: "https://randomuser.me/api/portraits/women/5.jpg",
   },
-  {
-    email: "mia.johnson@example.com",
-    fullName: "Mia Johnson",
-    password: 123456,
-    profilePic: "https://randomuser.me/api/portraits/women/6.jpg",
-  },
 ];
 
 const seedDatabase = async () => {
