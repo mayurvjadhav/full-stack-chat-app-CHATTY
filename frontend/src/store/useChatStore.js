@@ -57,22 +57,22 @@ export const useChatStore = create((set, get) => ({
       set({ messages: [...messages, res.data] });
 
       // 2. Update sidebar (lastMessage & move to top)
-      // const updatedChats = [...chats];
-      // const chatIndex = updatedChats.findIndex(
-      //   (chat) => chat.user._id === selectedUser._id
-      // );
+      const updatedChats = [...chats];
+      const chatIndex = updatedChats.findIndex(
+        (chat) => chat.user._id === selectedUser._id
+      );
 
-      // if (chatIndex !== -1) {
-      //   const updatedChat = { ...updatedChats[chatIndex] };
-      //   updatedChat.lastMessage = res.data;
-      //   updatedChat.unreadCount = 0; // Since you're the sender
+      if (chatIndex !== -1) {
+        const updatedChat = { ...updatedChats[chatIndex] };
+        updatedChat.lastMessage = res.data;
+        updatedChat.unreadCount = 0; // Since you're the sender
 
-      //   // Move chat to top
-      //   updatedChats.splice(chatIndex, 1);
-      //   updatedChats.unshift(updatedChat);
+        // Move chat to top
+        updatedChats.splice(chatIndex, 1);
+        updatedChats.unshift(updatedChat);
 
-      //   set({ chats: updatedChats });
-      // }
+        set({ chats: updatedChats });
+      }
     } catch (error) {
       console.log(error?.message);
     }
