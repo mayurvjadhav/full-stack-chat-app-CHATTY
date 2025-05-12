@@ -13,29 +13,60 @@ const ChatContainer = () => {
     getMessages,
     isMessagesLoading,
     selectedUser,
-    subscribeToMessages,
-    unsubscribeFromMessages,
+    loadOlderMessages,
   } = useChatStore();
   const { authUser } = useAuthStore();
   const messageEndRef = useRef(null);
+  const isFirstRender = useRef(true);
+
+  const scrollContainerRef = useRef(null);
+  const currentPage = useRef(1); // keeps track of pagination
+  const loadingOlderMessages = useRef(false);
+
+  const handleScroll = async () => {
+    if (!scrollContainerRef.current || loadingOlderMessages.current) return;
+
+    const container = scrollContainerRef.current;
+    const scrollTop = container.scrollTop;
+
+    if (scrollTop === 0) {
+      loadingOlderMessages.current = true;
+
+      // Capture current scroll height before loading more
+      const prevScrollHeight = container.scrollHeight;
+
+      currentPage.current += 1;
+      await loadOlderMessages(selectedUser._id, currentPage.current);
+
+      // Use a timeout to ensure DOM has updated
+      setTimeout(() => {
+        const newScrollHeight = container.scrollHeight;
+        container.scrollTop = newScrollHeight - prevScrollHeight;
+
+        loadingOlderMessages.current = false;
+      }, 0);
+    }
+  };
 
   useEffect(() => {
     getMessages(selectedUser._id);
-
-    subscribeToMessages();
-
-    return () => unsubscribeFromMessages();
-  }, [
-    selectedUser._id,
-    getMessages,
-    subscribeToMessages, unsubscribeFromMessages
-  ]);
+  }, [selectedUser._id, getMessages]);
 
   useEffect(() => {
-    if (messageEndRef.current && messages) {
-      messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+    if (messageEndRef.current && messages.length > 0) {
+      messageEndRef.current.scrollIntoView({
+        behavior: isFirstRender.current ? "auto" : "smooth",
+      });
+
+      // After the first scroll (on opening chat), disable auto mode
+      isFirstRender.current = false;
     }
   }, [messages]);
+
+  // Reset this flag when switching to another chat
+  useEffect(() => {
+    isFirstRender.current = true;
+  }, [selectedUser._id]);
 
   if (isMessagesLoading) {
     return (
@@ -51,7 +82,11 @@ const ChatContainer = () => {
     <div className="flex-1 flex flex-col overflow-auto">
       <ChatHeader />
 
-      <div className="flex-1 overflow-y-auto p-4 space-y-4">
+      <div
+        ref={scrollContainerRef}
+        onScroll={handleScroll}
+        className="flex-1 overflow-y-auto p-4 space-y-4"
+      >
         {Array.isArray(messages) &&
           messages.map((message) => (
             <div

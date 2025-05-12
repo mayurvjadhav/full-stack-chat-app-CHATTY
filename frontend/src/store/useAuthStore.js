@@ -15,6 +15,20 @@ export const useAuthStore = create((set, get) => ({
   onlineUsers: [],
   socket: null,
 
+  connectSocket: () => {
+    const { authUser } = get();
+    if (!authUser?._id) return;
+
+    const socket = io(BASE_URL, {
+      query: { userId: authUser._id },
+    });
+
+    set({ socket });
+
+    // Optional: Debug log
+    console.log("🟢 Socket connected:", socket);
+  },
+
   checkAuth: async () => {
     try {
       const res = await axiosInstance.get("/auth/check");

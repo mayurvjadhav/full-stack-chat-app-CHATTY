@@ -12,10 +12,24 @@ import { useEffect } from "react";
 import { Loader } from "lucide-react";
 import { Navigate } from "react-router-dom";
 import { Toaster } from "react-hot-toast";
+import { useChatStore } from "./store/useChatStore";
 
 const App = () => {
   const { authUser, checkAuth, isCheckingAuth, onlineUsers } = useAuthStore();
   const { theme } = useThemeStore();
+
+  const socket = useAuthStore((state) => state.socket);
+  const { subscribeToMessages, unsubscribeFromMessages } = useChatStore();
+
+  useEffect(() => {
+    if (!socket) return;
+
+    subscribeToMessages();
+
+    return () => {
+      unsubscribeFromMessages();
+    };
+  }, [socket]);
 
   useEffect(() => {
     checkAuth();
